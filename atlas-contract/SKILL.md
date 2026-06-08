@@ -1,9 +1,9 @@
 ---
 name: atlas-contract
-description: "Core skill of the Atlas series. Use when coding tasks risk silent goal drift: complete/full/end-to-end work, backend/API/data/persistence, preserve/keep/do-not-change, reference/layout matching, tests/validation, data consistency, behavior-touching refactor/optimization, long or multi-part work, or rework after dissatisfaction; Chinese: 完整实现, 保留, 不要改, 按参考图, 后端, mock, 占位符, 测试, 验证, 返工, 不对. Reply in the user's language. Match footprint to task complexity. Create a Goal Contract before non-trivial work; for long/high-risk work create a Phase Ledger before implementation. If Atlas.md exists, load confirmed clauses. Stop before destructive/scope-changing actions, hard deviations, unproven impact claims, failed/missing validation, missing phase approval, or required user decisions. Do not use for simple Q&A, pure explanation, or trivial edits."
+description: "Core skill of the Atlas series. Use for coding tasks where the agent might silently change, narrow, downgrade, mock, hide, reinterpret, or prematurely declare the user's goal complete, or quietly decide on its own that a change is 'safe', 'isolated', 'unnecessary', or 'out of scope'. Triggers: complete/full/end-to-end, backend/API/data/persistence, preserve/keep/do-not-change, reference/layout matching, tests/validation, data consistency, refactor/optimization that touches existing behavior, long or multi-part tasks, rework after the user is dissatisfied; Chinese: 完整实现, 保留, 不要改, 按参考图, 后端, mock, 占位符, 测试, 验证, 返工, 不对. Always reply in the user's current language. Match the agent's footprint to task complexity (Light / Medium / Heavy). Create a compact Goal Contract before non-trivial work; for long or high-risk work, create a Phase Ledger before implementing. If Atlas.md exists in the workspace, load its confirmed clauses into the contract. Stop before destructive or scope-changing actions, on hard deviations, on any unproven impact claim, on failed or missing validation, on missing phase approval, or on any required user decision. Do not use for simple Q&A, pure explanation, or trivial edits."
 ---
 
-# Atlas Contract v6
+# Atlas Contract v6.1
 
 Keep the agent aligned with the user's original goal during execution.
 
@@ -62,7 +62,7 @@ Atlas Event:
 
 **Event ID rule (phase-anchored):** IDs are `<phase>-A<n>` — e.g. `P0-A1`, `P0-A2`, `P1-A1`, `P1-A2`. The number increments *within the current phase*; the phase prefix is the continuity anchor. Light/Medium work that has no phases uses `P0` as the prefix. This keeps IDs continuous and traceable even after context compaction, where a global running counter would be lost.
 
-**Skill version:** The **first** Atlas event of a session adds one line to its header — `- Skill Version: atlas-contract v6` — so reported issues can be traced to a version. Later events omit it.
+**Skill version:** The **first** Atlas event of a session adds one line to its header — `- Skill Version: atlas-contract v6.1` — so reported issues can be traced to a version. Later events omit it.
 
 Stop Status rules: use `Final` only in a Final Audit. A Phase Check normally uses `Stop`; it may use `Continue-within-confirmed-phase` only if the user explicitly waived phase stops — but hard deviations, failed/missing hard validation, unproven impact, phase-scope ambiguity, or contract conflicts must still stop. Do not merge multiple events into one vague summary.
 
@@ -187,7 +187,7 @@ Chinese (anchor):
 ```text
 Atlas 事件：
 - 事件编号：P0-A1
-- 技能版本：atlas-contract v6
+- 技能版本：atlas-contract v6.1
 - 类型：目标合同（代码：GoalContract）
 - 触发来源：Skill 主动触发（代码：Skill-initiated）
 - 阶段：P0
@@ -399,6 +399,29 @@ D. Mark the current phase Partial / Blocked / Unverified.
 ATLAS_STOP: <localized: awaiting confirmation before continuing>
 ```
 
+Chinese (anchor):
+
+```text
+[事件头：类型 = 偏离通知，触发来源 = 失败触发 / 偏离触发 / Skill 主动触发，停止状态 = 停止]
+
+Atlas 偏离通知
+
+受影响合同项：...
+受影响阶段账本项：...
+偏离类型：硬性 / 软性
+建议改动：...
+原始要求：...
+原因：...
+影响：...
+选项：
+A. 保持原目标；在合同内修复。
+B. 批准本次偏离。
+C. 改用其他方案。
+D. 将当前阶段标记为部分完成 / 阻塞 / 未验证。
+
+ATLAS_STOP: 等待确认后再继续。
+```
+
 ## Runtime mock vs test mock
 
 A runtime mock / stub / fake data / placeholder cannot be completion evidence when real behavior was requested. Test-only mocks are allowed only if: limited to automated tests; the delivered runtime app still uses the real data layer / required integration; the mock does not replace implementation work; and the audit discloses the mock is test-only if it could be misread. Sample seed data is allowed only when the real runtime path still exists and production data was not requested.
@@ -450,6 +473,8 @@ Emitted at the end of Medium and Heavy footprints. (Light footprint has no audit
 
 If any check finds a problem, emit a Deviation Notice (§9) or mark the item appropriately before finalizing. Do not smooth over findings.
 
+**Ledger-eligible drift prompt.** If the audit's Deviations section records one or more hard deviations that were caught during the task (e.g. a hard Deviation Notice was raised, or an item is Violation/Partial that should have been Complete), end the audit with one line offering to invoke `atlas-ledger` to record them. Do not auto-write to Atlas.md and do not run the distillation yourself — only surface the offer, so the user does not have to remember that something was worth recording. If no hard deviation was caught, state "None" on that line. This is a prompt, not an automatic action.
+
 Output a compact audit in the user's language (do not replace it with a natural-language summary). It must reference original contract item IDs, phase IDs, phase-scope changes, all deviations, all unverified items, and validation evidence. Do not merge items into a generic summary.
 
 ```text
@@ -483,6 +508,44 @@ Deviations: None / ...
 Unverified: None / ...
 Files Changed / Evidence: ...
 Final Statement: ...
+Ledger-eligible drift detected: None / N hard deviation(s) were recorded (source: ...) — offer to invoke atlas-ledger to record them?
+```
+
+Chinese (anchor):
+
+```text
+[事件头：类型 = 最终审计，阶段 = 最终，停止状态 = Final]
+
+Atlas 最终审计
+
+状态：完成 / 部分完成 / 阻塞 / 未验证
+
+阶段：
+- [P1] 完成 / 部分完成 / 阻塞 / 未验证 - ...
+- [P2] ...
+
+阶段范围变化：无 / ...
+
+合同项：
+- [M1] 完成 / 部分完成 / 阻塞 / 未验证 - ...
+- [N1] 通过 / 违反 / 未验证 - ...
+- [P1] 已保留 / 已改变 / 未验证 - ...
+- [T1] 通过 / 失败 / 未验证 - ...
+- [D1] 通过 / 失败 / 未验证 - ...
+- [C1] 完成 / 部分完成 / 阻塞 / 未验证 - ...
+
+已完成：...
+未完成：...
+已保留：...
+验证：...
+使用的假设：...
+累计软偏离：无 / ...
+偏离：无 / ...
+未验证：无 / ...
+文件变更 / 证据：...
+最终说明：...
+
+可入账偏差检测：无 / 检测到 N 条被记录的硬偏离（来源：...），是否调用 atlas-ledger 记录？
 ```
 
 Do not say "done", "complete", "finished", "完成", "已完成", or equivalent if any hard item is partial, blocked, mocked, stubbed, hidden, downgraded, skeleton-only, visual-only, unverified, missing required backend/API/database/persistence, different from required data semantics / tests / reference layout / preserve constraints, missing a required Phase Check, or missing required validation evidence. If not fully verified, mark `Unverified` or `Partial`. Use Stop Status `Final` only here.

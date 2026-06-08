@@ -3,7 +3,7 @@ name: atlas-ledger
 description: "Companion to atlas-contract. Use after a coding task or phase governed by atlas-contract completes with a caught problem — a Final Audit marking Violation/Partial/Unverified that should have been Complete, a Post Review, a hard Deviation Notice, a recurrence caught in a Phase Check, or the user saying the result drifted/was wrong/incomplete/mocked (Chinese: 不对, 返工, 漏了, 这个记下来下次别再犯). It distills the caught drift into a reusable, project-local contract clause and, after user confirmation, records it in Atlas.md so the same drift is structurally prevented next time. Do not use on clean completions, optimization requests, ordinary code review, style preferences, or general takeaways; it records only caught drift, and only as enforceable clauses."
 ---
 
-# Atlas Ledger v2
+# Atlas Ledger v2.1
 
 Give the Atlas series a memory.
 
@@ -26,6 +26,17 @@ A diary says "I hid the feature." A ledger clause says "WHEN a backend requireme
 Write `Atlas.md` and all user-facing output in the language of the user's current instruction.
 
 **Machine keys stay in English; clause content is localized.** Never translate the keys `WHEN` / `DON'T` / `INSTEAD`, the IDs (`L1`, `O1`), `seen`, `severity`, `Source`, `RETIRED`, or section headers `Confirmed Clauses` / `Provisional Observations` — atlas-contract parses these, and translating them makes the read-back unstable. The text after each key is written in the user's language. (E.g. `WHEN: 硬性 Must-Do 的后端部分受阻` — key English, content Chinese. Do **not** write `当: ...`.)
+
+**Every process label this skill emits to the user must also be localized** (these are not machine keys — they are headings shown to the user, like the four gate names or the candidate-clause header). Only the fixed machine keys above stay English.
+
+Chinese label mapping (process labels — localize these):
+
+- `Atlas Event` → `Atlas 事件`; `Event ID` → `事件编号`; `Type` → `类型`; `Trigger Source` → `触发来源`; `Phase` → `阶段`; `Stop Status` → `停止状态`
+- `Candidate Clause` / `Suggested Clause` → `候选条款`; `Proposal` → `提案`; `awaiting confirmation` → `等待确认`
+- `Four acceptance gates` → `四道闸自检`; `Actionability` → `可执行性`; `Replay` → `回放`; `Generalization` → `泛化`; `Over-reach` → `误伤`; `Pass` → `通过`; `Fail` → `失败`
+- `confirmed on first occurrence` → `首次出现即确认`; `merged` → `已合并`; `retired` → `已退休`; `review: stale` → `待复核：可能失效`
+
+**Pre-output localization self-check:** Before sending any user-facing output, scan for untranslated English process labels (e.g. "Suggested Clause", "Actionability"). If any are found, translate them before sending. Do **not** translate the fixed machine keys (`WHEN`/`DON'T`/`INSTEAD`/IDs/`severity`/`Source`/`seen`/`Confirmed Clauses`/`Provisional Observations`) — those stay English even in a Chinese response.
 
 ---
 
